@@ -1,0 +1,24 @@
+{\rtf1\ansi\ansicpg932\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 Network Setting\
+$ vi /etc/sysconfig/network-scripts/ifcfg-eth0\
+TYPE=Ethernet\
+BOOTPROTO=static\
+IPADDR=192.168.0.200\
+NETMASK=255.255.255.0\
+GATEWAY=192.168.0.1\
+NAME=eth0\
+ONBOOT=yes\
+$ reboot\
+\
+softether\
+$ tar zxvf softether-vpnserver.tar.gz\
+$ cd vpnserver\
+$ make\
+$ chmod 600 *\
+$ chmod 700 vpncmd\
+$ chmod 700 vpnserver}

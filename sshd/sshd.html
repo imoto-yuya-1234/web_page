@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>ssh サーバー</title>
+  </head>
+  <body style="font-size:12pt;"
+	topmargin="30" bottommargin="30" leftmargin="80" rightmargin="80"
+	marginheight="30" marginwidth="80">
+    <h2>ssh サーバー</h2>
+    OS X Mountain Lion でセキュアな ssh サーバーを立ち上げます。
+    セキュアな ssh サーバーにするにはターミナルの知識が必要です。
+    ssh クライアント ( ssh サーバーに接続するコンピューター ) は 
+    Mac でターミナルを用いた場合を想定しています。
+    もちろん、Unix、Linux の CLI からでも、
+    Windows では PuTTY 等の ssh クライアントからでも構いません。
+    <h3>ssh サーバーの構築</h3>
+    「システム環境設定」の「共有」を選択します。<br>
+    <img src="share.png" width="391" height="331">
+    <br>
+    スクリーンショットの 1 のように「リモートログイン」を「入」にします。
+    これで Mac が ssh サーバーとして立ち上がります。
+    スクリーンショットの 2 は白抜きになっていますが、実際は user@hostname 
+    ( ここでの hostname は 192.168.0.1 ) となっています。
+    実際に LAN 上の別の Mac のターミナルで<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ ssh user@hostname<br>
+      </div>
+    <br>
+    と打ち込むとパスワードを要求されますが、ログインするユーザーのパスワードを打ち込んでください。
+    その際に打ち込んだパスワードが表示されません 
+    ( *** のような表記はでません ) が入力は出来ています。
+    これで ssh サーバーの立ち上がった Mac に接続できます。
+    hostname の部分はスクリーンショットの 3 の白抜き 
+    ( hoge.local ) でも良いです。<br>
+    <br>
+    <h3>セキュアなsshサーバー</h3>
+    ssh サーバーを WAN に公開しないのであれば、
+    アクセスできるユーザーを限定する程度で良いと思います。
+    ただ公開鍵認証を用いるとセキュリティも向上し、
+    ターミナルでの接続はパスワードの入力を省略出来ます。
+    
+    <h4>アクセスできるユーザーの限定</h4>
+    ssh でアクセス可能なユーザーを限定します。
+    スクリーンショットの 4 のように「アクセスを許可」の「次のユーザのみ」を選択します。
+    そのあと「＋」を選択して、 ssh でアクセスしたいユーザを選択します。<br>
+    
+    <h4>公開鍵認証手続き</h4>
+    ssh クライアント側 ( ssh サーバーにアクセスする側 ) のターミナルで<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ cd ~/.ssh<br>
+      $ ssh-keygen -t rsa 　　　全て Eneter で構いません。<br>
+      $ scp id_rsa.pub username@hostname:/Users/username/.ssh<br>
+      $ ssh user@hostname<br>
+      $ cd ~/.ssh<br>
+      $ cat id_rsa.pub >> authorized_keys<br>
+      $ chmod 600 authorized_keys<br>
+    </div>
+    <br>
+    これで公開鍵認証が出来るようになりました。
+    ssh クライアント側のターミナルから<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ ssh user@hostname<br>
+    </div>
+    <br>
+    パスワードを要求されずに ssh 接続が出来るようになったかと思います。
+    
+    <h4>ssh サーバーの設定を変更</h4>
+    OS X でのポート変更は/System/Library/LaunchDaemons/ssh.plistの編集によって行う。<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ vi /System/Library/LaunchDaemon/ssh.plist<br>
+      　&#12296 key &#12297 Listeners &#12296 /key &#12297<br>
+      　&#12296 dict &#12297<br>
+      　&#12296 key &#12297 SockServiceName &#12296 /key &#12297<br>
+      　&#12296 string &#12297 ssh &#12296 /string &#12297
+      　　　sshを23にするとポート23に変更される<br>
+      　&#12296 key &#12297 Bonjour &#12296 /key &#12297<br>
+    </div>
+    <br>
+    ポート変更以外は/etc/sshd_configの編集によって行う。<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ vi /etc/sshd_config<br>
+      　Protocol 2<br>
+      　PermitRootLogin no<br>
+      　RSAAuthentication yes<br>
+      　PubkeyAuthentication yes<br>
+      　AuthorizedKeysFile .ssh/authorized_keys<br>
+      　ChallengeResponseAuthentication no<br>
+      　UsePAM no
+    </div>
+    <br>
+    最後にsshdを再起動する。<br>
+    <br>
+    <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;">
+      $ /usr/sbin/sshd restart<br>
+    </div>
+    <center><a href="index.html">Topに戻る</a></center>
+  </body>
+</html>
